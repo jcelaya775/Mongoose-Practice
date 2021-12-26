@@ -39,4 +39,35 @@ const userSchema = new mongoose.Schema({
     address: addressSchema
 })
 
+// cannot use arrow (es6) functions
+userSchema.methods.sayHi = function () {
+    // b/c this instance keyword is needed
+    console.log(`Hi. My name is ${this.name}`);
+}
+
+// static level method
+userSchema.statics.findByName = function (name) {
+    return this.find({ name: new RegExp(name, 'i') })
+}
+
+// query level method
+userSchema.query.byName = function (name) {
+    return this.where({ name: new RegExp(name, 'i') })
+}
+
+// virtual method -> namedEmail property does not get saved in db
+userSchema.virtual('namedEmail').get(function () {
+    return `${this.name} <${this.email}>`
+})
+
+userSchema.pre('save', function (next) {
+    this.updatedAt = Date.now()
+    next()
+})
+
+userSchema.post('save', function (doc, next) {
+    doc.sayHi()
+    next()
+})
+
 module.exports = mongoose.model('User', userSchema)
