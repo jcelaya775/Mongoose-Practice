@@ -31,3 +31,5 @@ async function run() {
         console.log(e.message)
     }
 }
+
+console.log('test')
